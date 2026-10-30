@@ -1,0 +1,8 @@
+[package]
+name = "sogen-build"
+description = "Build script support for binaries using the sogen emulator crates"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true

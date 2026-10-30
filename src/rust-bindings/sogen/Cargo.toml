@@ -1,0 +1,34 @@
+[package]
+name = "sogen"
+description = "Safe Rust bindings to the sogen Windows/Linux user-space emulator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+readme = "README.md"
+links = "sogen"
+
+[features]
+default = ["static"]
+static = ["sogen-sys/static"]
+shared = ["sogen-sys/shared"]
+sdl = ["sogen-sys/sdl"]
+
+[dependencies]
+bitflags = "2"
+cxx.workspace = true
+rustc-hash = "2"
+sogen-native.workspace = true
+sogen-sys.workspace = true
+thiserror = "2"
+
+[build-dependencies]
+sogen-build.workspace = true
+
+[dev-dependencies]
+object = { version = "0.39", default-features = false, features = ["pe"] }
+
+[[test]]
+name = "managed_process"
+harness = false

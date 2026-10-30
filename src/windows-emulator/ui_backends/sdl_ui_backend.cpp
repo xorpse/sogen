@@ -1,4 +1,5 @@
 #include "../std_include.hpp"
+#include "../sdl_subsystem.hpp"
 #include "../vulkan_handle_utils.hpp"
 #include <platform/ui_backend.hpp>
 
@@ -694,7 +695,7 @@ namespace sogen
 
                 if (this->initialized_)
                 {
-                    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+                    sdl::quit_subsystem(SDL_INIT_VIDEO);
                 }
             }
 
@@ -1515,7 +1516,7 @@ namespace sogen
                 if (!this->initialized_)
                 {
                     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
-                    this->initialized_ = SDL_InitSubSystem(SDL_INIT_VIDEO);
+                    this->initialized_ = sdl::init_subsystem(SDL_INIT_VIDEO);
                 }
 
                 return this->initialized_;

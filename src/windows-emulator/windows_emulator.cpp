@@ -1259,11 +1259,10 @@ namespace sogen
             return;
         }
 
-        hooks[section_index] = this->emu().hook_memory_range_execution(section.region.start, section.region.length,
-                                                                       [this](cpu_interface&, const uint64_t address) {
-                                                                           const std::scoped_lock lock(this->kernel_lock_);
-                                                                           this->track_section_first_execution(address); //
-                                                                       });
+        hooks[section_index] = this->emu().hook_memory_range_execution(
+            section.region.start, section.region.length, [this](cpu_interface& cpu, const uint64_t address) {
+                this->dispatch_on_cpu(cpu, [&] { this->track_section_first_execution(address); });
+            });
     }
 
     void windows_emulator::install_section_first_execution_hooks()
@@ -1542,9 +1541,8 @@ namespace sogen
 
         // TODO: Unicorn needs this - This should be handled in the backend
         emu.hook_instruction(x86_hookable_instructions::invalid, [&](cpu_interface& cpu, uint64_t) {
-            const std::scoped_lock lock(this->kernel_lock_);
             // TODO: Unify icicle & unicorn handling
-            dispatch_illegal_instruction_violation(*this, this->vcpu(cpu.index()));
+            this->dispatch_on_cpu(cpu, [&] { dispatch_illegal_instruction_violation(*this, this->vcpu(cpu.index())); });
             return instruction_hook_continuation::skip_instruction; //
         });
 
@@ -1741,7 +1739,7 @@ namespace sogen
                     }
                     catch (const std::exception& e)
                     {
-                        this->log.error("vCPU %u worker terminated: %s\n", i, e.what());
+                        this->synchronize([&] { this->log.error("vCPU %u worker terminated: %s\n", i, e.what()); });
                         this->stop();
                     }
 

@@ -107,12 +107,12 @@ namespace sogen::unicorn
                     return false;
                 }
 
-                uc_x86_mmr gdt{};
+                uc_x86_mmr descriptor_table{};
 
-                this->read_register(x86_register::gdtr, &gdt, sizeof(gdt));
+                this->read_register(static_cast<x86_register>(reg), &descriptor_table, sizeof(descriptor_table));
 
-                table.base = gdt.base;
-                table.limit = gdt.limit;
+                table.base = descriptor_table.base;
+                table.limit = descriptor_table.limit;
                 return true;
             }
 
@@ -125,7 +125,9 @@ namespace sogen::unicorn
                 if (inst_type == x86_hookable_instructions::invalid)
                 {
                     function_wrapper<int, uc_engine*> wrapper([c = std::move(callback), this](uc_engine*) {
-                        return (c(*this, 0) == instruction_hook_continuation::skip_instruction) ? 1 : 0;
+                        auto continuation = instruction_hook_continuation::skip_instruction;
+                        this->run_hook_guarded([&] { continuation = c(*this, 0); });
+                        return continuation == instruction_hook_continuation::skip_instruction ? 1 : 0;
                     });
 
                     uce(uc_hook_add(*this, hook.make_reference(), UC_HOOK_INSN_INVALID, wrapper.get_function(), wrapper.get_user_data(), 0,
@@ -136,7 +138,9 @@ namespace sogen::unicorn
                 if (inst_type == x86_hookable_instructions::syscall)
                 {
                     function_wrapper<void, uc_engine*> wrapper([c = std::move(callback), this](uc_engine*) {
-                        const auto continuation = c(*this, 0);
+                        // A failed hook leaves RIP on the syscall, so resuming after the rethrown exception retries it.
+                        auto continuation = instruction_hook_continuation::finalized_instruction_pointer;
+                        this->run_hook_guarded([&] { continuation = c(*this, 0); });
                         if (continuation == instruction_hook_continuation::finalized_instruction_pointer)
                         {
                             this->reg(x86_register::rip, this->read_instruction_pointer() - syscall_instruction_size);
@@ -151,7 +155,9 @@ namespace sogen::unicorn
                 }
 
                 function_wrapper<int, uc_engine*> wrapper([c = std::move(callback), this](uc_engine*) {
-                    return (c(*this, 0) == instruction_hook_continuation::skip_instruction) ? 1 : 0;
+                    auto continuation = instruction_hook_continuation::skip_instruction;
+                    this->run_hook_guarded([&] { continuation = c(*this, 0); });
+                    return continuation == instruction_hook_continuation::skip_instruction ? 1 : 0;
                 });
 
                 const auto uc_instruction = map_hookable_instruction(inst_type);
@@ -163,8 +169,9 @@ namespace sogen::unicorn
 
             emulator_hook* hook_interrupt(interrupt_hook_callback callback) override
             {
-                function_wrapper<void, uc_engine*, int> wrapper(
-                    [c = std::move(callback), this](uc_engine*, const int interrupt_type) { c(*this, interrupt_type); });
+                function_wrapper<void, uc_engine*, int> wrapper([c = std::move(callback), this](uc_engine*, const int interrupt_type) {
+                    this->run_hook_guarded([&] { c(*this, interrupt_type); });
+                });
 
                 unicorn_hook hook{*this};
 

@@ -1,3 +1,29 @@
+add_library(icicle-bridge INTERFACE)
+
+if(MSVC)
+  target_link_libraries(icicle-bridge INTERFACE
+    ws2_32.lib
+    Userenv.lib
+    ntdll.lib
+    Bcrypt.lib
+  )
+endif()
+
+add_custom_target(icicle-data
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_LIST_DIR}/data" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+    COMMENT "Copying Ghidra Processor Specification"
+)
+add_dependencies(icicle-bridge icicle-data)
+
+if(SKBUILD)
+  install(DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/data/Ghidra" DESTINATION "${SKBUILD_PLATLIB_DIR}")
+endif()
+
+# A Rust consumer links the icicle crate itself; a second copy built as a staticlib would duplicate the Rust standard library.
+if(NOT SOGEN_BUILD_ICICLE_BRIDGE)
+  return()
+endif()
+
 include(ExternalProject)
 
 set(ICICLE_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/cargo-build)
@@ -56,25 +82,5 @@ ExternalProject_Add(
     BUILD_BYPRODUCTS ${ICICLE_RUST_LIB}
 )
 
-add_custom_command(
-    TARGET icicle-rust-project POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_LIST_DIR}/data" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
-    COMMENT "Copying Ghidra Processor Specification"
-)
-
-if(SKBUILD)
-  install(DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/data/Ghidra" DESTINATION "${SKBUILD_PLATLIB_DIR}")
-endif()
-
-add_library(icicle-bridge INTERFACE)
 add_dependencies(icicle-bridge icicle-rust-project)
 target_link_libraries(icicle-bridge INTERFACE ${ICICLE_RUST_LIB})
-
-if(MSVC)
-  target_link_libraries(icicle-bridge INTERFACE
-    ws2_32.lib
-    Userenv.lib
-    ntdll.lib
-    Bcrypt.lib
-  )
-endif()

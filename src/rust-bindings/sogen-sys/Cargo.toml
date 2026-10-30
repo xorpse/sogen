@@ -1,0 +1,20 @@
+[package]
+name = "sogen-sys"
+description = "Raw cxx bindings to the sogen Windows/Linux user-space emulator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+build = "build.rs"
+
+[features]
+default = ["static"]
+static = ["dep:icicle", "sogen-native/static"]
+shared = ["sogen-native/shared"]
+sdl = ["sogen-native/sdl"]
+
+[dependencies]
+cxx.workspace = true
+icicle = { path = "../../backends/icicle-emulator/icicle-bridge", optional = true }
+sogen-native.workspace = true

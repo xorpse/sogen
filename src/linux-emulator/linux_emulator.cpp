@@ -782,7 +782,7 @@ namespace sogen
                         }
                     }
 
-                    if (this->last_stop_reason_ == stop_reason::none)
+                    if (!this->should_stop && this->last_stop_reason_ == stop_reason::none)
                     {
                         this->record_stop(stop_reason::unhandled_memory_violation, format_memory_violation_stop_detail(address, 1));
                         this->process.exit_status.reset();
@@ -821,6 +821,11 @@ namespace sogen
             }
         }
 
+        if (this->should_stop && this->last_stop_reason_ == stop_reason::none)
+        {
+            this->record_stop(stop_reason::explicit_stop);
+        }
+
         if (use_count && this->executed_instructions_ >= target_instructions && this->last_stop_reason_ == stop_reason::none)
         {
             this->record_stop(stop_reason::instruction_limit, "count=" + std::to_string(count));
@@ -829,11 +834,6 @@ namespace sogen
 
     void linux_emulator::stop()
     {
-        if (this->last_stop_reason_ == stop_reason::none)
-        {
-            this->record_stop(stop_reason::explicit_stop);
-        }
-
         this->should_stop = true;
         this->emu().stop();
     }

@@ -24,6 +24,10 @@ endif()
 sogen_add_subdirectory_and_get_targets("backends" BACKEND_TARGETS)
 sogen_targets_set_folder("backends" ${BACKEND_TARGETS})
 
+if(SOGEN_ENABLE_RUST_BINDINGS)
+  add_subdirectory(rust-bindings)
+endif()
+
 if(ANDROID)
   add_subdirectory(android-runtime)
 endif()

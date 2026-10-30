@@ -79,7 +79,7 @@ if(SOGEN_ENABLE_SDL3 AND NOT EMSCRIPTEN AND NOT ANDROID)
   # sogen runs in on Android don't have; there the embedder supplies the UI
   # backend and AAudio provides audio.
   if(SOGEN_USE_SYSTEM_SDL3)
-    find_package(SDL3 CONFIG QUIET)
+    find_package(SDL3 CONFIG QUIET GLOBAL)
   endif()
 
   if(TARGET SDL3::SDL3)

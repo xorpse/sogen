@@ -1,4 +1,5 @@
 #include "../std_include.hpp"
+#include "../sdl_subsystem.hpp"
 #include <platform/audio_backend.hpp>
 
 #include <mutex>
@@ -38,7 +39,7 @@ namespace sogen
                 this->stop();
                 if (this->initialized_)
                 {
-                    SDL_QuitSubSystem(SDL_INIT_AUDIO);
+                    sdl::quit_subsystem(SDL_INIT_AUDIO);
                 }
             }
 
@@ -61,7 +62,7 @@ namespace sogen
 
                 if (!this->initialized_)
                 {
-                    this->initialized_ = SDL_InitSubSystem(SDL_INIT_AUDIO);
+                    this->initialized_ = sdl::init_subsystem(SDL_INIT_AUDIO);
                     if (!this->initialized_)
                     {
                         return false;

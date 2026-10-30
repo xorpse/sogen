@@ -413,6 +413,11 @@ namespace sogen
             return std::forward<Function>(fn)();
         }
 
+        bool kernel_lock_held() const
+        {
+            return this->kernel_lock_.is_held_by_current_thread();
+        }
+
         vcpu_context& vcpu(const size_t index)
         {
             return *this->vcpus_.at(index);

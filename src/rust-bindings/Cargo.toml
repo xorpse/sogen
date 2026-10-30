@@ -1,0 +1,17 @@
+[workspace]
+resolver = "3"
+members = ["sogen-build", "sogen-native", "sogen-sys", "sogen"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "GPL-2.0-only"
+repository = "https://github.com/momo5502/sogen"
+rust-version = "1.85"
+
+[workspace.dependencies]
+cxx = "=1.0.205"
+cxx-gen = "=0.7.205"
+sogen-build = { path = "sogen-build", default-features = false }
+sogen-native = { path = "sogen-native", default-features = false }
+sogen-sys = { path = "sogen-sys", default-features = false }

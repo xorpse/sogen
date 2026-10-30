@@ -95,6 +95,18 @@ print(emu.process.exit_status)
 See `examples/python/README.md` for setup details and a larger example.  
 &nbsp;  
 
+## Rust Bindings
+
+The `sogen` crate in `src/rust-bindings` exposes the Windows and Linux personalities and a bare ARM64 CPU to Rust. Add it as a git dependency:
+
+```toml
+[dependencies]
+sogen = { git = "https://github.com/momo5502/sogen" }
+```
+
+See `src/rust-bindings/sogen/README.md` for build requirements and an example.  
+&nbsp;  
+
 ## Unofficial Bindings
 
 [Dart bindings](https://github.com/Wdestroier/sogen_dart) are available in a separate repository.  

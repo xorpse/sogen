@@ -70,7 +70,7 @@ namespace sogen
         bool disable_output_{false};
         bool silent_{false};
         sink sink_{};
-        mutable std::mutex print_mutex_{};
+        mutable std::recursive_mutex print_mutex_{};
         void print_message(color c, std::string_view message, bool force = false) const;
     };
 

@@ -1,0 +1,24 @@
+[package]
+name = "sogen-native"
+description = "Builds the native parts of the sogen emulator crates"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+links = "sogen-native"
+build = "build.rs"
+
+[features]
+default = ["static"]
+# Builds sogen from this source tree with CMake and links it statically.
+static = []
+# Builds sogen from this source tree with CMake as shared libraries and links them dynamically.
+shared = []
+# Gives Windows emulators SDL windows and audio. Without it they use null UI and audio backends.
+sdl = []
+
+[build-dependencies]
+cmake = "0.1.58"
+cxx-gen.workspace = true
+proc-macro2 = "1"

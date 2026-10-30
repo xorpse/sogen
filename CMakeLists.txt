@@ -16,6 +16,8 @@ option(SOGEN_ENABLE_SDL3 "Enable SDL3 host UI and audio backends" ON)
 option(SOGEN_USE_SYSTEM_SDL3 "Prefer a system-installed SDL3 over the vendored deps/SDL submodule" ON)
 option(SOGEN_EMSCRIPTEN_MEMORY64 "Enable memory 64 support for emscripten builds" OFF)
 option(SOGEN_EMSCRIPTEN_SUPPORT_NODEJS "Enable Node.js filesystem for emscripten compilation" OFF)
+option(SOGEN_ENABLE_RUST_BINDINGS "Build the C++ side of the Rust bindings; driven by the sogen-native build script" OFF)
+option(SOGEN_BUILD_ICICLE_BRIDGE "Build the icicle bridge crate with cargo; turned off when a Rust consumer links the crate itself" ON)
 
 set(SOGEN_REFLECTION_LEVEL "0" CACHE STRING "Reflection level for the build")
 

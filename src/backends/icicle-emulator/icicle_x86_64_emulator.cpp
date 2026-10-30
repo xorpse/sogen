@@ -275,7 +275,7 @@ namespace sogen::icicle
 
             auto* write_wrapper = +[](void* user, const uint64_t addr, const void* data, const size_t length) {
                 const auto* w = static_cast<mmio_wrapper*>(user);
-                w->write_cb(addr + w->base, data, length);
+                w->write_cb(addr - w->base, data, length);
             };
 
             icicle_map_mmio(this->emu_, address, size, read_wrapper, ptr, write_wrapper, ptr);
